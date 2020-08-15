@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Random;
 
 @RestController
 public class MainController {
@@ -98,5 +100,86 @@ public class MainController {
         System.out.println(result);
 
         return "loadBalancerClient";
+    }
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    @GetMapping("/client6")
+    public Object client6(){
+        ServiceInstance instance = loadBalancerClient.choose("provider");
+
+        String url = "http://"+instance.getHost()+":"+instance.getPort()+"/hello";
+
+        System.out.println(url);
+
+
+        String result = restTemplate.getForObject(url,String.class);
+
+        System.out.println(result);
+
+        return "loadBalancerClient:"+result;
+    }
+
+    @GetMapping("/client7")
+    public Object client7(){
+        List<ServiceInstance> instance = discoveryClient.getInstances("provider");
+        int i= new Random().nextInt(instance.size());
+        ServiceInstance serviceInstance = instance.get(i);
+        String url = "http://"+serviceInstance.getHost()+":"+serviceInstance.getPort()+"/hello";
+
+        System.out.println(url);
+
+
+        String result = restTemplate.getForObject(url,String.class);
+
+        System.out.println(result);
+
+        return "loadBalancerClient:"+result;
+    }
+
+    @GetMapping("/client8")
+    public Object client8(){
+        List<ServiceInstance> instance = discoveryClient.getInstances("provider");
+        int i= new Random().nextInt(instance.size());
+        ServiceInstance serviceInstance = instance.get(i);
+        String url = "http://"+serviceInstance.getHost()+":"+serviceInstance.getPort()+"/hello";
+
+        System.out.println(url);
+
+
+        String result = restTemplate.getForObject(url,String.class);
+
+        System.out.println(result);
+
+        return "loadBalancerClient:"+result;
+    }
+
+    @GetMapping("/client9")
+    public Object client9(){
+        String url = "http://provider/hello";
+
+        System.out.println(url);
+
+
+        String result = restTemplate.getForObject(url,String.class);
+
+        System.out.println(result);
+
+        return "loadBalancerClient:"+result;
+    }
+
+    @GetMapping("/client10")
+    public Object client10(){
+        String url = "http://provider/hello";
+
+        System.out.println(url);
+
+
+        String result = restTemplate.getForObject(url,String.class);
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(url, String.class);
+        System.out.println(result);
+
+        return "restTemplate:"+forEntity.getStatusCodeValue();
     }
 }
